@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import EntryPage from "./entrypage";
+import TalkingPage from "./talkingpage";
+import SummaryPage from "./summarypage";
+import Logo from "./images/patientaidlogo.png";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [currentPage, setCurrentPage] = useState("entry");
+    const [painLevel, setPainLevel] = useState([]);
+    const [waitTime, setWaitTime] = useState(0);
+
+    const handleNext = () => {
+        if (currentPage === "entry") {
+            setCurrentPage("talking");
+        } else if (currentPage === "talking") {
+            // Simulate backend calculation of wait time
+            setWaitTime(Math.floor(Math.random() * 30) + 1);
+            setCurrentPage("summary");
+        }
+    };
+
+    const handleReset = () => {
+        setCurrentPage("entry");
+        setPainLevel([]);
+        setWaitTime(0);
+    };
+
+    return (
+        <div>
+            <img src={Logo} alt="PatientAid Logo" className="logo" />
+            {currentPage === "entry" && <EntryPage onNext={handleNext} />}
+            {currentPage === "talking" && (
+                <TalkingPage
+                    onSummary={(painLevel) => {
+                        setPainLevel(painLevel);
+                        handleNext();
+                    }}
+                />
+            )}
+            {currentPage === "summary" && (
+                <SummaryPage
+                    painLevel={painLevel}
+                    waitTime={waitTime}
+                    onReset={handleReset}
+                />
+            )}
+        </div>
+    );
+};
 
 export default App;
